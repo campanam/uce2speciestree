@@ -2,7 +2,7 @@
 
 #----------------------------------------------------------------------------------------
 # uce2speciestree
-UCE2SPECIESTREEVER = "0.2.0"
+UCE2SPECIESTREEVER = "0.3.0"
 # Michael G. Campana, 2019
 # Smithsonian Conservation Biology Institute
 #----------------------------------------------------------------------------------------
@@ -99,7 +99,9 @@ def make_paup
 	for sample in $samples.keys
 		@header << "    " + sample + "    " + $samples[sample].concat + "\n"
 	end
-	@header << ";\nend;\n\n" + @charset + @charpar + "\n\nbegin paup;\n    svdq evalq=all bootstrap;\nend;\n"
+	@header << ";\nend;\n\n" + @charset + @charpar + "\n\nbegin paup;\n    svdq evalq=all bootstrap;"
+	@header << "\n    Outgroup #{$options.paupout};" unless $options.paupout.nil?
+	@header << "\n    SaveTrees file=#{$options.paupsave} format=#{$options.paupformat};\n    quit;\nend;\n"
 	File.open($options.outdir + "/uce2svdquartets.nex", 'w') do |write|
 		write.puts @header
 	end
@@ -159,6 +161,9 @@ class Parser
 		args.ml = false # Perform ML search in RAxML
 		args.raxn = 100 # Number of RAxML bootstrap replicates
 		args.raxml = "" # String of parameters to pass to RAxML
+		args.paupsave = "uce2svdquartets.tre" # PAUP* saved tree filename
+		args.paupformat = "Newick" # PAUP* saved tree file format
+		args.paupout = nil # PAUP* outgroup
 		opt_parser = OptionParser.new do |opts|
 			opts.banner = "Command-line usage: ruby uce2speciestree.rb [options]"
 			opts.separator ""
@@ -207,6 +212,17 @@ class Parser
 			end
 			opts.on("-e", "--email [VALUE]", String, "E-mail address to notify") do |email|
 				args.email = email if email != nil
+			end
+			opts.separator ""
+			opts.separator "PAUP* options:"
+			opts.on("-s", "--paupsave [VALUE]", String, "Saved PAUP* tree file name (Default = uce2svdquartets.tre)") do |paupsave|
+				args.paupsave = paupsave if paupsave != nil
+			end
+			opts.on("-F", "--paupformat [VALUE]", String, "Saved PAUP* tree file format (Default = Newick)") do |paupformat|
+				args.paupformat = paupformat if paupformat != nil
+			end
+			opts.on("-O", "--paupout [VALUE]", String, "PAUP* outgroup (Default = unrooted)") do |paupout|
+				args.paupout = paupout if paupout != nil
 			end
 			opts.separator ""
 			opts.separator "General information:"

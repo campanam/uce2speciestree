@@ -2,7 +2,7 @@
 
 #----------------------------------------------------------------------------------------
 # uce2speciestree
-UCE2SPECIESTREEVER = "0.1.0"
+UCE2SPECIESTREEVER = "0.2.0"
 # Michael G. Campana, 2019
 # Smithsonian Conservation Biology Institute
 #----------------------------------------------------------------------------------------
@@ -27,10 +27,12 @@ def get_files
 	@file_names = "OriginalLocus\tRenamedLocus\n"
 	Dir.foreach(File.expand_path($options.indir)) do |file|
 		unless File.directory?(file)
-			$filecount += 1
-			$loci[file] = ""
-			@file_names << $options.indir + "/" + file + "\t" + $options.outdir + "/locus." + $filecount.to_s + ".fa\n"
-			convert_nexus(file)
+			if file[-4..-1] == ".nex" or file[-6..-1] == ".nexus"
+				$filecount += 1
+				$loci[file] = ""
+				@file_names << $options.indir + "/" + file + "\t" + $options.outdir + "/locus." + $filecount.to_s + ".fa\n"
+				convert_nexus(file)
+			end
 		end
 	end
 	File.open($options.outdir + "/locusnames.tsv", 'w') do |write|
@@ -48,12 +50,18 @@ def convert_nexus(file)
 				line_arr = line.split("nchar=")
 				$loci[file] = line_arr[1][0..-2].to_i
 			elsif start
-				line_arr = line.split(" ")
-				@out << ">" + line_arr[0] + "\n" #Append header to outline
-				@out << convert_seq(line_arr[-1]) + "\n" # Append sequence to outline
-				make_loci(file,line_arr[0],line_arr[-1])
+				unless  line == "\n"
+					line_arr = line.split(" ")
+					make_loci(file,line_arr[0],convert_seq(line_arr[-1]))
+				end
 			end
 			start = true if line == "matrix\n"
+		end
+	end
+	for sample in $samples.keys
+		unless $samples[sample].loci[file].nil?
+			@out << ">" + sample + "\n" #Append header to outline
+			@out <<  $samples[sample].loci[file] + "\n" # Append sequence to outline
 		end
 	end
 	File.open(File.expand_path($options.outdir) + "/locus." + $filecount.to_s + ".fa", 'w') do |write|
@@ -64,8 +72,10 @@ end
 def make_loci(locus,name,sequence)
 	if !$samples.keys.include?(name)
 		$samples[name] = Sample.new(name, { locus => sequence })
-	else
+	elsif !$samples[name].loci.keys.include?(locus)
 		$samples[name].loci[locus] = sequence
+	else
+		$samples[name].loci[locus] << sequence
 	end
 end
 #----------------------------------------------------------------------------------------

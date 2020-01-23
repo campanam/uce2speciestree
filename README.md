@@ -3,7 +3,6 @@ Pipeline script to generate input files for ASTRAL and SVDquartets from phyluce 
 
 Michael G. Campana, 2019  
 Smithsonian Conservation Biology Institute  
-Contact: <campanam@si.edu>  
 
 Pipeline script to generate input files for [ASTRAL](https://github.com/smirarab/ASTRAL) and [SVDquartets + PAUP*](https://www.asc.ohio-state.edu/kubatko.2/software/SVDquartets/) from a collection of [phyluce](https://phyluce.readthedocs.io/en/latest/) UCE loci alignments in nexus format.  
 

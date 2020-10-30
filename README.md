@@ -1,5 +1,4 @@
-# uce2speciestree
-Pipeline script to generate input files for ASTRAL and SVDquartets from phyluce nexus alignments  
+# uce2speciestree  
 
 Michael G. Campana, 2019  
 Smithsonian Conservation Biology Institute  

@@ -1,7 +1,10 @@
 # uce2speciestree Change Log  
-Michael G. Campana, 2019  
+Michael G. Campana, 2019-2025  
 Smithsonian Conservation Biology Institute  
 Contact: campanam@si.edu  
+
+### Version 0.4.0  
+Updated for current version of SI/HPC  
 
 ### Version 0.3.0  
 Added basic PAUP* options to save tree and set outgroup  

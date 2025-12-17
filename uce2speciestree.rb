@@ -2,8 +2,8 @@
 
 #----------------------------------------------------------------------------------------
 # uce2speciestree
-UCE2SPECIESTREEVER = "0.3.0"
-# Michael G. Campana, 2019
+UCE2SPECIESTREEVER = "0.4.0"
+# Michael G. Campana, 2019-2025  
 # Smithsonian Conservation Biology Institute
 #----------------------------------------------------------------------------------------
 
@@ -123,12 +123,12 @@ def convert_seq(fasta)
 end
 #----------------------------------------------------------------------------------------
 def write_array_qsub
-	header = "#!/bin/sh\n#$ -S /bin/sh\n#$ -q #{$options.queue}\n#$ -l mres=#{$options.memory},h_data=#{$options.memory},h_vmem=#{$options.memory}"
+	header = "#!/bin/sh\n#$ -S /bin/sh\n#$ -q #{$options.queue}\n#$ -l mres=#{$options.mres},h_data=#{$options.h_data},h_vmem=#{$options.vmem}"
 	header << ",himem" if $options.himem
 	header << ",lopri" if $options.lopri
 	header << "\n#$ -j y\n#$ -cwd\n#$ -N uce2speciestree\n"
 	header << "#$ -m bea\n#$ -M #{$options.email}\n" if $options.email != ""
-	header << "module load bioinformatics/raxml\nraxmlHPC-SSE3 -s #{$options.outdir}/locus.$SGE_TASK_ID.fa -w #{File.expand_path($options.outdir)} -n locus.$SGE_TASK_ID.tree -m #{$options.submodel} -p #{$options.raxp} -N #{$options.raxn}"
+	header << "module load bio/raxml\nraxmlHPC-SSE3 -s #{$options.outdir}/locus.$SGE_TASK_ID.fa -w #{File.expand_path($options.outdir)} -n locus.$SGE_TASK_ID.tree -m #{$options.submodel} -p #{$options.raxp} -N #{$options.raxn}"
 	if $options.ml
 		header << " -f a -x #{$options.raxb[0]}"
 	elsif $options.raxb[1]
@@ -150,7 +150,9 @@ class Parser
 		args = OpenStruct.new
 		args.indir = "./" # Input directory
 		args.outdir = "./" # Output directory
-		args.memory = "1G" # Memory reserved
+		args.mres = "1G" # Memory reserved
+		args.h_data = "1G" # h_data per CPU
+		args.vmem = "1G" # Virtual memory
 		args.himem = false # High memory flag
 		args.lopri = false # Low priority falg
 		args.queue = "" # Qsub queue
@@ -201,8 +203,14 @@ class Parser
 			opts.on("-q", "--queue [VALUE]", String, "Qsub queue to use") do |queue|
 				args.queue = queue if queue != nil
 			end
-			opts.on("-m", "--memory [VALUE]", String, "Reserved memory (Default = 1G)") do |memory|
-				args.memory = memory if memory != nil
+			opts.on("-m", "--mres [VALUE]", String, "Total reserved memory (Default = 1G)") do |mres|
+				args.mres = mres if mres != nil
+			end
+			opts.on("-t", "--h_data [VALUE]", String, "h_data per CPU (Default = 1G)") do |h_data|
+				args.h_data = h_data if h_data != nil
+			end
+			opts.on("-v", "--vmem [VALUE]", String, "Total reserved virtual memory (Default = 1G)") do |vmem|
+				args.vmem = vmem if vmem != nil
 			end
 			opts.on("-H", "--himem", "Use high-memory queue (Default is false)") do |himem|
 				args.himem = true

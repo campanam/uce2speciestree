@@ -209,7 +209,7 @@ class Parser
 			opts.on("-t", "--h_data [VALUE]", String, "h_data per CPU (Default = 1G)") do |h_data|
 				args.h_data = h_data if h_data != nil
 			end
-			opts.on("-v", "--vmem [VALUE]", String, "Total reserved virtual memory (Default = 1G)") do |vmem|
+			opts.on("-V", "--vmem [VALUE]", String, "Total reserved virtual memory (Default = 1G)") do |vmem|
 				args.vmem = vmem if vmem != nil
 			end
 			opts.on("-H", "--himem", "Use high-memory queue (Default is false)") do |himem|
